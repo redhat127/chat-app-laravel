@@ -15,6 +15,7 @@ Route::middleware('guest')
             ->name('login.')
             ->controller(LoginController::class)
             ->group(function () {
+                Route::post('/', 'post')->name('post');
                 Route::get('/{provider}/redirect', 'redirect')->name('provider.redirect');
                 Route::get('/{provider}/callback', 'callback')->name('provider.callback');
             });
