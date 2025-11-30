@@ -30,7 +30,7 @@ export default function AccountIndex() {
             <CardDescription>Use form below to update your profile details</CardDescription>
           </CardHeader>
           <CardContent>
-            <ProfileDetailsForm />
+            <ProfileDetailsForm user={user} />
           </CardContent>
         </Card>
         {user.is_password_null && (

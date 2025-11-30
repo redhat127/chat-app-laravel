@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { LoadingSwap } from '@/components/ui/loading-swap';
-import { useUser } from '@/hooks/use-user';
 import { setServerValidationErrors } from '@/lib/utils';
+import type { User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -22,12 +22,11 @@ const profileDetailsSchema = z.object({
     }),
 });
 
-export const ProfileDetailsForm = () => {
-  const user = useUser()!;
+export const ProfileDetailsForm = ({ user: { name } }: { user: User }) => {
   const form = useForm<z.infer<typeof profileDetailsSchema>>({
     resolver: zodResolver(profileDetailsSchema),
     defaultValues: {
-      name: user.name,
+      name,
     },
   });
   const {
