@@ -12,7 +12,7 @@
   @inertiaHead
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-inter antialiased">
   @inertia
 </body>
 
