@@ -14,14 +14,17 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return $this->only([
-            'id',
-            'name',
-            'email',
-            'created_at',
-            'updated_at',
-            'provider_name',
-            'avatar',
-        ]);
+        return [
+            ...$this->only([
+                'id',
+                'name',
+                'email',
+                'created_at',
+                'updated_at',
+                'provider_name',
+                'avatar',
+            ]),
+            'is_password_null' => is_null($this->password),
+        ];
     }
 }

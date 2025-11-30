@@ -6,6 +6,7 @@ export interface User {
   updated_at: string;
   provider_name: string | null;
   avatar: string | null;
+  is_password_null: boolean;
 }
 
 export type flashMessage = {

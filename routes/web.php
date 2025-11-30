@@ -35,5 +35,6 @@ Route::middleware('auth')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/profile-details', 'profileDetails')->name('profileDetails');
+                Route::post('/set-password', 'setPassword')->name('setPassword');
             });
     });
