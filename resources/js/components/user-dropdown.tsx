@@ -1,5 +1,8 @@
-import type { User } from '@/types';
-import { useMemo } from 'react';
+import account from '@/routes/account';
+import type { User as IUser } from '@/types';
+import { Link } from '@inertiajs/react';
+import { User } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { LogoutForm } from './form/logout-form';
 import {
   DropdownMenu,
@@ -10,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-export const UserDropdown = ({ user: { name, avatar, email } }: { user: User }) => {
+export const UserDropdown = ({ user: { name, avatar, email } }: { user: IUser }) => {
   const userInitials = useMemo(() => {
     return (
       <div className="h-8 w-8 overflow-hidden rounded-full">
@@ -22,8 +25,9 @@ export const UserDropdown = ({ user: { name, avatar, email } }: { user: User }) 
       </div>
     );
   }, [avatar, name]);
+  const [open, setOpen] = useState(false);
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger>{userInitials}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel className="flex items-center gap-2">
@@ -34,6 +38,18 @@ export const UserDropdown = ({ user: { name, avatar, email } }: { user: User }) 
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem className="p-0">
+          <Link
+            href={account.index()}
+            className="flex w-full items-center gap-1.5 px-2 py-1.5"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            <User />
+            Account
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem className="p-0">
           <LogoutForm />
         </DropdownMenuItem>
