@@ -20,6 +20,8 @@ class UserResource extends JsonResource
             'email',
             'created_at',
             'updated_at',
+            'provider_name',
+            'avatar'
         ]);
     }
 }

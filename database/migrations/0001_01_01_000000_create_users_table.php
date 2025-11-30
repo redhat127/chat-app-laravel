@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->string('provider_name')->nullable();
+            $table->string('avatar')->nullable();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
