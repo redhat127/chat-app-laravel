@@ -12,10 +12,10 @@ export const LogoutForm = () => {
         e.preventDefault();
         router.post(LogoutController.index(), undefined, {
           onBefore() {
-            setIsPending(false);
-          },
-          onSuccess() {
             setIsPending(true);
+          },
+          onFinish() {
+            setIsPending(false);
           },
         });
       }}
