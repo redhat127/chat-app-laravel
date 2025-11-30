@@ -60,7 +60,7 @@ class LoginController extends Controller
 
             request()->session()->regenerate();
 
-            return redirect()->route('home')
+            return redirect()->intended()
                 ->with('flashMessage', [
                     'type' => 'success',
                     'text' => 'You are logged in.'
