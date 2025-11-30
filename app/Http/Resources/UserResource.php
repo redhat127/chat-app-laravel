@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'created_at',
             'updated_at',
             'provider_name',
-            'avatar'
+            'avatar',
         ]);
     }
 }

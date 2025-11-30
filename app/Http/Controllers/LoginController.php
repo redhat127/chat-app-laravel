@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
-use Laravel\Socialite\Facades\Socialite;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 
 enum Provider: string
@@ -34,7 +33,7 @@ class LoginController extends Controller
                 ->only([
                     'name',
                     'email',
-                    'avatar'
+                    'avatar',
                 ])->all();
 
             $existingUser = User::where('email', $socialiteUser['email'])->first();
@@ -44,13 +43,13 @@ class LoginController extends Controller
                     return redirect()->route('home')
                         ->with('flashMessage', [
                             'type' => 'error',
-                            'text' => 'This email is already registered with a different provider. Please login with your original provider.'
+                            'text' => 'This email is already registered with a different provider. Please login with your original provider.',
                         ]);
                 }
             } else {
                 $newUser = User::create([
                     ...$socialiteUser,
-                    'provider_name' => $provider
+                    'provider_name' => $provider,
                 ]);
             }
 
@@ -63,7 +62,7 @@ class LoginController extends Controller
             return redirect()->intended()
                 ->with('flashMessage', [
                     'type' => 'success',
-                    'text' => 'You are logged in.'
+                    'text' => 'You are logged in.',
                 ]);
         } catch (ClientException $exception) {
             logger()->error($exception->getMessage());
@@ -71,7 +70,7 @@ class LoginController extends Controller
             return redirect()->route('home')
                 ->with('flashMessage', [
                     'type' => 'error',
-                    'text' => 'Authentication failed. Please try again.'
+                    'text' => 'Authentication failed. Please try again.',
                 ]);
         } catch (InvalidStateException $exception) {
             logger()->error($exception->getMessage());
@@ -79,7 +78,7 @@ class LoginController extends Controller
             return redirect()->route('home')
                 ->with('flashMessage', [
                     'type' => 'error',
-                    'text' => 'Session expired or invalid. Please try again.'
+                    'text' => 'Session expired or invalid. Please try again.',
                 ]);
         } catch (Exception $exception) {
             logger()->error($exception->getMessage());
@@ -87,7 +86,7 @@ class LoginController extends Controller
             return redirect()->route('home')
                 ->with('flashMessage', [
                     'type' => 'error',
-                    'text' => 'Something went wrong. Please try again later.'
+                    'text' => 'Something went wrong. Please try again later.',
                 ]);
         }
     }

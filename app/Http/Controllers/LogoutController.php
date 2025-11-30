@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
@@ -17,7 +16,7 @@ class LogoutController extends Controller
         return redirect()->route('home')
             ->with('flashMessage', [
                 'type' => 'success',
-                'text' => 'You are logged out.'
+                'text' => 'You are logged out.',
             ]);
     }
 }
