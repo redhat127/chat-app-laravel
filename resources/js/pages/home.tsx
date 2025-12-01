@@ -90,7 +90,7 @@ export default function Home(props: { publicRooms?: { data: Room[] } | null; joi
                 {joinedRooms && joinedRooms.length > 0 ? (
                   <RoomList rooms={joinedRooms} forJoinedRooms user={user} />
                 ) : (
-                  <p className="text-sm text-muted-foreground">No rooms found.</p>
+                  <p className="text-sm text-muted-foreground">No room found.</p>
                 )}
               </Deferred>
             </CardContent>
@@ -107,7 +107,7 @@ export default function Home(props: { publicRooms?: { data: Room[] } | null; joi
                 {publicRooms && publicRooms.length > 0 ? (
                   <RoomList rooms={publicRooms.filter((room) => !joinedRooms?.some((r) => r.id === room.id))} />
                 ) : (
-                  <p className="text-sm text-muted-foreground">No rooms found.</p>
+                  <p className="text-sm text-muted-foreground">No room found.</p>
                 )}
               </Deferred>
             </CardContent>
