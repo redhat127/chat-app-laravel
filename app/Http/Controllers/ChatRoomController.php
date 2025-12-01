@@ -20,7 +20,10 @@ class ChatRoomController extends Controller
         ]);
 
         $newRoom = Auth::user()->ownedRooms()->create($validated);
-        $newRoom->members()->attach([Auth::id()]);
+
+        $currentUserId = Auth::id();
+
+        $newRoom->members()->attach([$currentUserId]);
 
         $text = 'Chat room '.'"'.str($validated['name'])->limit(preserveWords: true).'"'.' created.';
 
@@ -47,18 +50,20 @@ class ChatRoomController extends Controller
             return back()->with('flashMessage', ['type' => 'error', 'text' => 'You cannot join a private room.']);
         }
 
-        if ($room->user_id === Auth::id()) {
+        $currentUserId = Auth::id();
+
+        if ($room->user_id === $currentUserId) {
             return back()->with('flashMessage', [
                 'type' => 'error',
                 'text' => 'You cannot join a room you created.',
             ]);
         }
 
-        if ($room->members()->where('member_id', Auth::id())->exists()) {
+        if ($room->members()->where('member_id', $currentUserId)->exists()) {
             return back()->with('flashMessage', ['type' => 'error', 'text' => 'You are already a member of this room.']);
         }
 
-        $room->members()->attach(Auth::id());
+        $room->members()->attach($currentUserId);
 
         return redirect()->route('room.show', ['roomId' => $room->id])
             ->with('flashMessage', [
@@ -79,18 +84,20 @@ class ChatRoomController extends Controller
             return back()->with('flashMessage', ['type' => 'error', 'text' => 'Room not found.']);
         }
 
-        if ($room->user_id === Auth::id()) {
+        $currentUserId = Auth::id();
+
+        if ($room->user_id === $currentUserId) {
             return back()->with('flashMessage', [
                 'type' => 'error',
                 'text' => 'You cannot leave a room you created.',
             ]);
         }
 
-        if (! $room->members()->where('member_id', Auth::id())->exists()) {
+        if (! $room->members()->where('member_id', $currentUserId)->exists()) {
             return back()->with('flashMessage', ['type' => 'error', 'text' => 'You are not a member of this room.']);
         }
 
-        $room->members()->detach(Auth::id());
+        $room->members()->detach($currentUserId);
 
         return back()->with('flashMessage', [
             'type' => 'success',
