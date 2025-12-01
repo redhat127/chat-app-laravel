@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ChatRoomController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return inertia('home');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('guest')
     ->group(function () {
@@ -37,5 +37,13 @@ Route::middleware('auth')
                 Route::get('/', 'index')->name('index');
                 Route::post('/profile-details', 'profileDetails')->name('profileDetails');
                 Route::post('/set-password', 'setPassword')->name('setPassword');
+            });
+
+        Route::prefix('room')
+            ->name('room.')
+            ->controller(ChatRoomController::class)
+            ->group(function () {
+                Route::get('/create', 'createRoom')->name('createRoom');
+                Route::post('/create', 'createRoomPost')->name('createRoomPost');
             });
     });

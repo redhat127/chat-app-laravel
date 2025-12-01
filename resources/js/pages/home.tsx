@@ -1,3 +1,4 @@
+import ChatRoomController from '@/actions/App/Http/Controllers/ChatRoomController';
 import { LoginForm } from '@/components/form/login-form';
 import { BaseLayout } from '@/components/layout/base';
 import { Button } from '@/components/ui/button';
@@ -7,17 +8,19 @@ import { GithubIcon } from '@/icons/github';
 import { GoogleIcon } from '@/icons/google';
 import { generateTitle } from '@/lib/utils';
 import login from '@/routes/login';
-import { Head } from '@inertiajs/react';
+import type { Room } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
-export default function Home() {
+export default function Home(props: { rooms: { data: Room[] } | null }) {
   const user = useUser();
+  const rooms = props.rooms?.data;
   return (
     <>
       <Head>
         <title>{generateTitle('Real-time messaging')}</title>
       </Head>
-      {!user && (
+      {!user ? (
         <div className="flex min-h-screen items-center justify-center">
           <div className="w-full p-4 px-8">
             <Card className="mx-auto max-w-md">
@@ -46,6 +49,24 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      ) : (
+        <div className="space-y-4 p-4 px-8">
+          <Card>
+            <CardHeader className="gap-0">
+              <CardTitle>
+                <h1 className="text-2xl font-bold">Chat Rooms</h1>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardContent>
+              <Button asChild>
+                <Link href={ChatRoomController.createRoom()}>Create a new Room</Link>
+              </Button>
+            </CardContent>
+          </Card>
+          {rooms && rooms?.length > 0 ? null : <p className="text-sm text-muted-foreground">No room found.</p>}
         </div>
       )}
     </>

@@ -9,6 +9,15 @@ export interface User {
   is_password_null: boolean;
 }
 
+export interface Room {
+  id: string;
+  name: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
+
 export type flashMessage = {
   type: 'error' | 'success';
   text: string;
