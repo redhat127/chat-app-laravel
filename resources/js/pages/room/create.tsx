@@ -1,6 +1,6 @@
 import { CreateChatRoomForm } from '@/components/form/chat-room/create-chat-room-form';
 import { BaseLayout } from '@/components/layout/base';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/react';
@@ -18,6 +18,7 @@ export default function CreateRoom() {
             <CardTitle>
               <h1 className="text-2xl font-bold">Create a new Room</h1>
             </CardTitle>
+            <CardDescription>Use form below to create a new chat room</CardDescription>
           </CardHeader>
           <CardContent>
             <CreateChatRoomForm />
