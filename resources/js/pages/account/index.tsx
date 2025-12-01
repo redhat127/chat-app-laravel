@@ -23,7 +23,7 @@ export default function AccountIndex() {
           </CardHeader>
         </Card>
         <Card>
-          <CardHeader className="gap-0">
+          <CardHeader>
             <CardTitle>
               <h2 className="text-xl font-bold">Profile Details</h2>
             </CardTitle>
@@ -35,7 +35,7 @@ export default function AccountIndex() {
         </Card>
         {user.is_password_null && (
           <Card>
-            <CardHeader className="gap-0">
+            <CardHeader>
               <CardTitle>
                 <h2 className="text-xl font-bold">Set Password</h2>
               </CardTitle>
