@@ -16,6 +16,7 @@ export interface Room {
   created_at: string;
   updated_at: string;
   user_id: string;
+  members_count: number;
 }
 
 export type flashMessage = {

@@ -14,13 +14,16 @@ class ChatRoomResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return $this->only([
-            'id',
-            'name',
-            'is_public',
-            'created_at',
-            'updated_at',
-            'user_id',
-        ]);
+        return [
+            ...$this->only([
+                'id',
+                'name',
+                'is_public',
+                'created_at',
+                'updated_at',
+                'user_id',
+            ]),
+            'members_count' => $this->whenCounted('members'),
+        ];
     }
 }

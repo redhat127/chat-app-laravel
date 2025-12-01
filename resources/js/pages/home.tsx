@@ -1,19 +1,33 @@
 import ChatRoomController from '@/actions/App/Http/Controllers/ChatRoomController';
 import { LoginForm } from '@/components/form/login-form';
 import { BaseLayout } from '@/components/layout/base';
+import { RoomList } from '@/components/room/room-list';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@/hooks/use-user';
 import { GithubIcon } from '@/icons/github';
 import { GoogleIcon } from '@/icons/google';
 import { generateTitle } from '@/lib/utils';
 import login from '@/routes/login';
 import type { Room } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Deferred, Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
-export default function Home({ rooms: { data: rooms } }: { rooms: { data: Room[] } }) {
+const RoomListSkeleton = () => {
+  return (
+    <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+      {[...Array(4)].map((_, i) => (
+        <Skeleton key={i} className="h-40 w-full rounded-lg" />
+      ))}
+    </div>
+  );
+};
+
+export default function Home(props: { publicRooms?: { data: Room[] } | null; joinedRooms?: { data: Room[] } } | null) {
   const user = useUser();
+  const publicRooms = props?.publicRooms?.data;
+  const joinedRooms = props?.joinedRooms?.data;
   return (
     <>
       <Head>
@@ -51,21 +65,53 @@ export default function Home({ rooms: { data: rooms } }: { rooms: { data: Room[]
         </div>
       ) : (
         <div className="space-y-4 p-4 px-8">
-          <Card>
-            <CardHeader className="gap-0">
+          <Card className="gap-4">
+            <CardHeader>
               <CardTitle>
                 <h1 className="text-2xl font-bold">Chat Rooms</h1>
               </CardTitle>
+              <CardDescription>View all public rooms and rooms you’ve joined</CardDescription>
             </CardHeader>
-          </Card>
-          <Card>
             <CardContent>
               <Button asChild>
                 <Link href={ChatRoomController.createRoom()}>Create a new Room</Link>
               </Button>
             </CardContent>
           </Card>
-          {rooms.length > 0 ? null : <p className="text-sm text-muted-foreground">No room found.</p>}
+          <Card className="gap-4">
+            <CardHeader>
+              <CardTitle>
+                <h2 className="text-xl font-bold">Joined Rooms</h2>
+              </CardTitle>
+              <CardDescription>Rooms you're currently a member of</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Deferred data="joinedRooms" fallback={RoomListSkeleton}>
+                {joinedRooms && joinedRooms.length > 0 ? (
+                  <RoomList rooms={joinedRooms} forJoinedRooms />
+                ) : (
+                  <p className="text-sm text-muted-foreground">No rooms found.</p>
+                )}
+              </Deferred>
+            </CardContent>
+          </Card>
+          <Card className="gap-4">
+            <CardHeader>
+              <CardTitle>
+                <h2 className="text-xl font-bold">Public Rooms</h2>
+              </CardTitle>
+              <CardDescription>Join public rooms from the community</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Deferred data="publicRooms" fallback={RoomListSkeleton}>
+                {publicRooms && publicRooms.length > 0 ? (
+                  <RoomList rooms={publicRooms.filter((room) => !joinedRooms?.some((r) => r.id === room.id))} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">No rooms found.</p>
+                )}
+              </Deferred>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>
