@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatRoom;
 use Illuminate\Support\Facades\Auth;
 
 class ChatRoomController extends Controller
@@ -28,5 +29,71 @@ class ChatRoomController extends Controller
                 'type' => 'success',
                 'text' => $text,
             ]);
+    }
+
+    public function joinRoom()
+    {
+        $roomId = request()->validate([
+            'roomId' => ['bail', 'required', 'string', 'ulid'],
+        ])['roomId'];
+
+        $room = ChatRoom::find($roomId);
+
+        if (! $room) {
+            return back()->with('flashMessage', ['type' => 'error', 'text' => 'Room not found.']);
+        }
+
+        if (! $room->is_public) {
+            return back()->with('flashMessage', ['type' => 'error', 'text' => 'You cannot join a private room.']);
+        }
+
+        if ($room->user_id === Auth::id()) {
+            return back()->with('flashMessage', [
+                'type' => 'error',
+                'text' => 'You cannot join a room you created.',
+            ]);
+        }
+
+        if ($room->members()->where('member_id', Auth::id())->exists()) {
+            return back()->with('flashMessage', ['type' => 'error', 'text' => 'You are already a member of this room.']);
+        }
+
+        $room->members()->attach(Auth::id());
+
+        return back()->with('flashMessage', [
+            'type' => 'success',
+            'text' => 'You have successfully joined the room "'.str($room->name)->limit(preserveWords: true).'".',
+        ]);
+    }
+
+    public function leaveRoom()
+    {
+        $roomId = request()->validate([
+            'roomId' => ['bail', 'required', 'string', 'ulid'],
+        ])['roomId'];
+
+        $room = ChatRoom::find($roomId);
+
+        if (! $room) {
+            return back()->with('flashMessage', ['type' => 'error', 'text' => 'Room not found.']);
+        }
+
+        if ($room->user_id === Auth::id()) {
+            return back()->with('flashMessage', [
+                'type' => 'error',
+                'text' => 'You cannot leave a room you created.',
+            ]);
+        }
+
+        if (! $room->members()->where('member_id', Auth::id())->exists()) {
+            return back()->with('flashMessage', ['type' => 'error', 'text' => 'You are not a member of this room.']);
+        }
+
+        $room->members()->detach(Auth::id());
+
+        return back()->with('flashMessage', [
+            'type' => 'success',
+            'text' => 'You have successfully left the room "'.str($room->name)->limit(preserveWords: true).'".',
+        ]);
     }
 }

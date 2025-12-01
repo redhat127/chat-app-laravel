@@ -45,5 +45,7 @@ Route::middleware('auth')
             ->group(function () {
                 Route::get('/create', 'createRoom')->name('createRoom');
                 Route::post('/create', 'createRoomPost')->name('createRoomPost');
+                Route::post('/join-room', 'joinRoom')->name('joinRoom');
+                Route::post('/leave-room', 'leaveRoom')->name('leaveRoom');
             });
     });

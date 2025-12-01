@@ -88,7 +88,7 @@ export default function Home(props: { publicRooms?: { data: Room[] } | null; joi
             <CardContent>
               <Deferred data="joinedRooms" fallback={RoomListSkeleton}>
                 {joinedRooms && joinedRooms.length > 0 ? (
-                  <RoomList rooms={joinedRooms} forJoinedRooms />
+                  <RoomList rooms={joinedRooms} forJoinedRooms user={user} />
                 ) : (
                   <p className="text-sm text-muted-foreground">No rooms found.</p>
                 )}
