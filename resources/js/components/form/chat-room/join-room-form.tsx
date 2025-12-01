@@ -1,10 +1,11 @@
 import ChatRoomController from '@/actions/App/Http/Controllers/ChatRoomController';
 import { Button } from '@/components/ui/button';
 import { LoadingSwap } from '@/components/ui/loading-swap';
+import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export const JoinRoomForm = ({ roomId }: { roomId: string }) => {
+export const JoinRoomForm = ({ roomId, btnClassName = '' }: { roomId: string; btnClassName?: string }) => {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   return (
     <form
@@ -27,7 +28,7 @@ export const JoinRoomForm = ({ roomId }: { roomId: string }) => {
         );
       }}
     >
-      <Button type="submit" disabled={isFormDisabled} className="w-full">
+      <Button type="submit" disabled={isFormDisabled} className={cn('w-full', btnClassName)}>
         <LoadingSwap isLoading={isFormDisabled}>Join</LoadingSwap>
       </Button>
     </form>

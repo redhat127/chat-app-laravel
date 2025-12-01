@@ -92,7 +92,7 @@ class ChatRoomController extends Controller
 
         $room->members()->detach(Auth::id());
 
-        return redirect()->route('home')->with('flashMessage', [
+        return back()->with('flashMessage', [
             'type' => 'success',
             'text' => 'You have successfully left the room "'.str($room->name)->limit(preserveWords: true).'".',
         ]);
@@ -105,6 +105,10 @@ class ChatRoomController extends Controller
             ['is_public', true],
         ])->withCount('members')->firstOrFail()->toResource();
 
-        return inertia('room/show', compact('room'));
+        $isCurrentUserMember = $room->members()->where('member_id', Auth::id())->exists();
+
+        $isRoomCreator = $room->user_id === Auth::id();
+
+        return inertia('room/show', compact('room', 'isCurrentUserMember', 'isRoomCreator'));
     }
 }
