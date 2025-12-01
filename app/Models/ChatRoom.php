@@ -26,4 +26,9 @@ class ChatRoom extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function scopePublic($query)
+    {
+        return $query->where('is_public', true);
+    }
 }

@@ -100,15 +100,24 @@ class ChatRoomController extends Controller
 
     public function show(string $roomId)
     {
-        $room = ChatRoom::where([
-            ['id', $roomId],
-            ['is_public', true],
-        ])->withCount('members')->firstOrFail()->toResource();
+        $room = ChatRoom::query()
+            ->whereKey($roomId)
+            ->public()
+            ->withCount('members')
+            ->firstOrFail();
 
-        $isCurrentUserMember = $room->members()->where('member_id', Auth::id())->exists();
+        $currentUserId = Auth::id();
 
-        $isRoomCreator = $room->user_id === Auth::id();
+        $isCurrentUserMember = $room->members()
+            ->where('member_id', $currentUserId)
+            ->exists();
 
-        return inertia('room/show', compact('room', 'isCurrentUserMember', 'isRoomCreator'));
+        $isRoomCreator = $room->user_id === $currentUserId;
+
+        return inertia('room/show', [
+            'room' => $room->toResource(),
+            'isCurrentUserMember' => $isCurrentUserMember,
+            'isRoomCreator' => $isRoomCreator,
+        ]);
     }
 }
