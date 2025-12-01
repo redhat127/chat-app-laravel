@@ -15,6 +15,9 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('name');
             $table->boolean('is_public');
+            $table->foreignUlid('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }
