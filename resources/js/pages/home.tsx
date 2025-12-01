@@ -12,9 +12,8 @@ import type { Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
-export default function Home(props: { rooms: { data: Room[] } | null }) {
+export default function Home({ rooms: { data: rooms } }: { rooms: { data: Room[] } }) {
   const user = useUser();
-  const rooms = props.rooms?.data;
   return (
     <>
       <Head>
@@ -66,7 +65,7 @@ export default function Home(props: { rooms: { data: Room[] } | null }) {
               </Button>
             </CardContent>
           </Card>
-          {rooms && rooms?.length > 0 ? null : <p className="text-sm text-muted-foreground">No room found.</p>}
+          {rooms.length > 0 ? null : <p className="text-sm text-muted-foreground">No room found.</p>}
         </div>
       )}
     </>

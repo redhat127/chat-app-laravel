@@ -18,7 +18,8 @@ class ChatRoomController extends Controller
             'is_public' => ['bail', 'required', 'boolean'],
         ]);
 
-        Auth::user()->rooms()->create($validated);
+        $newRoom = Auth::user()->ownedRooms()->create($validated);
+        $newRoom->members()->attach([Auth::id()]);
 
         $text = 'Chat room '.'"'.str($validated['name'])->limit(preserveWords: true).'"'.' created.';
 

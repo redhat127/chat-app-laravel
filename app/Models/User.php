@@ -23,8 +23,19 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function rooms()
+    public function ownedRooms()
     {
         return $this->hasMany(ChatRoom::class);
+    }
+
+    public function rooms()
+    {
+        return $this->belongsToMany(ChatRoom::class, 'chat_room_member', 'member_id', 'chat_room_id')
+            ->withTimestamps();
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
     }
 }

@@ -8,7 +8,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $rooms = null;
+        $rooms = ['data' => []];
 
         if (Auth::id()) {
             $rooms = Auth::user()->rooms()->latest()->get()->toResourceCollection();

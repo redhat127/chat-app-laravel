@@ -10,4 +10,14 @@ class Message extends Model
 {
     /** @use HasFactory<\Database\Factories\MessageFactory> */
     use HasFactory, HasUlids;
+
+    public function room()
+    {
+        return $this->belongsTo(ChatRoom::class, 'chat_room_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
