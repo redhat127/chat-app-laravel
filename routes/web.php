@@ -47,5 +47,6 @@ Route::middleware('auth')
                 Route::post('/create', 'createRoomPost')->name('createRoomPost');
                 Route::post('/join-room', 'joinRoom')->name('joinRoom');
                 Route::post('/leave-room', 'leaveRoom')->name('leaveRoom');
+                Route::get('/{roomId}', 'show')->name('show');
             });
     });

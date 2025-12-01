@@ -1,4 +1,6 @@
+import { show } from '@/routes/room';
 import type { Room, User } from '@/types';
+import { Link } from '@inertiajs/react';
 import { JoinRoomForm } from '../form/chat-room/join-room-form';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -18,7 +20,10 @@ export const RoomList = ({ rooms, forJoinedRooms = false, user }: { rooms: Room[
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {forJoinedRooms ? <Button className="w-full">Enter</Button> : <JoinRoomForm roomId={room.id} />}
+            {!forJoinedRooms && <JoinRoomForm roomId={room.id} />}
+            <Button asChild className="w-full">
+              <Link href={show({ roomId: room.id })}>Enter</Link>
+            </Button>
             {forJoinedRooms && room.user_id !== user?.id && <LeaveRoomForm roomId={room.id} />}
           </CardContent>
         </Card>

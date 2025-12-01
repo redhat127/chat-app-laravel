@@ -60,10 +60,11 @@ class ChatRoomController extends Controller
 
         $room->members()->attach(Auth::id());
 
-        return back()->with('flashMessage', [
-            'type' => 'success',
-            'text' => 'You have successfully joined the room "'.str($room->name)->limit(preserveWords: true).'".',
-        ]);
+        return redirect()->route('room.show', ['roomId' => $room->id])
+            ->with('flashMessage', [
+                'type' => 'success',
+                'text' => 'You have successfully joined the room "'.str($room->name)->limit(preserveWords: true).'".',
+            ]);
     }
 
     public function leaveRoom()
@@ -91,9 +92,19 @@ class ChatRoomController extends Controller
 
         $room->members()->detach(Auth::id());
 
-        return back()->with('flashMessage', [
+        return redirect()->route('home')->with('flashMessage', [
             'type' => 'success',
             'text' => 'You have successfully left the room "'.str($room->name)->limit(preserveWords: true).'".',
         ]);
+    }
+
+    public function show(string $roomId)
+    {
+        $room = ChatRoom::where([
+            ['id', $roomId],
+            ['is_public', true],
+        ])->withCount('members')->firstOrFail()->toResource();
+
+        return inertia('room/show', compact('room'));
     }
 }
