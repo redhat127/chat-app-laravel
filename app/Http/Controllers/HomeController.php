@@ -9,15 +9,15 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $currentUserId = Auth::id();
+        $currentUser = Auth::user();
 
         return inertia('home', [
-            'publicRooms' => inertia()->defer(fn () => $currentUserId ? ChatRoom::latest()
-                ->where('is_public', true)
+            'publicRooms' => inertia()->defer(fn() => $currentUser ? ChatRoom::latest()
+                ->public()
                 ->withCount('members')
                 ->get()
                 ->toResourceCollection() : null, 'publicRooms'),
-            'joinedRooms' => inertia()->defer(fn () => $currentUserId ? Auth::user()
+            'joinedRooms' => inertia()->defer(fn() => $currentUser ? $currentUser
                 ->rooms()
                 ->latest()
                 ->withCount('members')
