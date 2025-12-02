@@ -90,7 +90,13 @@ export const SendMessageForm = ({
           render={({ field, fieldState }) => {
             return (
               <Field data-invalid={fieldState.invalid} className="gap-2">
-                <Textarea {...field} aria-invalid={fieldState.invalid} autoComplete="on" placeholder="Type something..." />
+                <Textarea
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="on"
+                  placeholder="Type something..."
+                  disabled={!currentUserIsMember}
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
