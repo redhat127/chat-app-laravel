@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->string('provider_name')->nullable();
+            $table->string('provider_name');
             $table->string('avatar')->nullable();
         });
 

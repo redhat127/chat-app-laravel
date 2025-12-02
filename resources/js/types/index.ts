@@ -4,7 +4,7 @@ export interface User {
   email: string;
   created_at: string;
   updated_at: string;
-  provider_name: string | null;
+  provider_name: string;
   avatar: string | null;
   is_password_null: boolean;
 }
