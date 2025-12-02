@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BroadcastMessageEvent;
 use App\Http\Resources\MessageResource;
 use App\Models\ChatRoom;
 use Illuminate\Support\Facades\Auth;
@@ -44,8 +45,10 @@ class MessageController extends Controller
 
         $message->setRelations(['user' => $currentUser]);
 
-        return response()->json([
-            'new_message' => new MessageResource($message),
-        ]);
+        $new_message = new MessageResource($message);
+
+        broadcast(new BroadcastMessageEvent($room->id, $new_message))->toOthers();
+
+        return response()->json(compact('new_message'));
     }
 }

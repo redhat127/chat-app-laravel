@@ -5,6 +5,7 @@ import { LoadingSwap } from '@/components/ui/loading-swap';
 import { Textarea } from '@/components/ui/textarea';
 import type { Message } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { echo } from '@laravel/echo-react';
 import axios, { AxiosError } from 'axios';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -44,8 +45,18 @@ export const SendMessageForm = ({
       className="mx-4"
       onSubmit={handleSubmit(async ({ text }) => {
         try {
+          const socketId = echo().socketId();
+          if (!socketId) return;
           setIsPending(true);
-          const { data } = await axios.post<{ new_message: Message }>(MessageController.post.url({ roomId: roomId }), { text });
+          const { data } = await axios.post<{ new_message: Message }>(
+            MessageController.post.url({ roomId: roomId }),
+            { text },
+            {
+              headers: {
+                'X-Socket-ID': socketId,
+              },
+            },
+          );
           resetField('text');
           addMessage(data.new_message);
         } catch (e) {

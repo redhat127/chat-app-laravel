@@ -10,6 +10,7 @@ import { cn, generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
 import type { Message, Room } from '@/types';
 import { Deferred, Head, Link } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { CircleAlert } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -26,6 +27,7 @@ export default function ShowRoom({
 }) {
   const messagesCardOuterDivRef = useRef<HTMLDivElement>(null);
   const messagesCardRef = useRef<HTMLDivElement>(null);
+
   useLayoutEffect(() => {
     const messagesCardOuterDiv = messagesCardOuterDivRef.current;
     const messagesCard = messagesCardRef.current;
@@ -50,13 +52,25 @@ export default function ShowRoom({
     window.addEventListener('resize', updateHeight);
     return () => window.removeEventListener('resize', updateHeight);
   }, []);
+
   const [messages, setMessages] = useState(serverMessages?.data);
+
   useEffect(() => {
     setMessages(serverMessages?.data);
   }, [serverMessages?.data]);
+
   const addMessage = useCallback((newMessage: Message) => {
     setMessages((prev) => [...(prev || []), newMessage]);
   }, []);
+
+  const { leave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
+    addMessage(data.new_message);
+  });
+
+  useEffect(() => {
+    return () => leave();
+  }, [leave]);
+
   return (
     <>
       <Head>
