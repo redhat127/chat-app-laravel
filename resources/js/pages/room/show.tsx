@@ -30,11 +30,23 @@ export default function ShowRoom({
     const messagesCardOuterDiv = messagesCardOuterDivRef.current;
     const messagesCard = messagesCardRef.current;
     if (!messagesCard || !messagesCardOuterDiv) return;
+
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+
+    const firstCardHeight = messagesCardOuterDiv.querySelector<HTMLDivElement>('[data-slot="card"]')?.getBoundingClientRect().height ?? 0;
+
+    const outerPaddingTop = parseFloat(getComputedStyle(messagesCardOuterDiv).paddingTop);
+    const outerPaddingBottom = parseFloat(getComputedStyle(messagesCardOuterDiv).paddingBottom);
+
+    const styles = getComputedStyle(document.documentElement);
+    const spacingValue = styles.getPropertyValue('--spacing').trim();
+    const spaceY = parseFloat(spacingValue) * 4;
+
     const updateHeight = () => {
-      const outerDivPaddingTop = parseFloat(getComputedStyle(messagesCardOuterDiv).paddingTop);
-      messagesCard.style.height = `${window.innerHeight - messagesCard.getBoundingClientRect().top - outerDivPaddingTop}px`;
+      messagesCard.style.height = `calc(100vh - (${headerHeight + firstCardHeight + outerPaddingTop + outerPaddingBottom}px + ${spaceY}rem))`;
     };
     updateHeight();
+
     window.addEventListener('resize', updateHeight);
     return () => window.removeEventListener('resize', updateHeight);
   }, []);
