@@ -15,7 +15,15 @@ const sendMessageSchema = z.object({
   text: z.string().trim().min(1, 'text is required.').max(160, 'text is too long.'),
 });
 
-export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIsMember: boolean; roomId: string }) => {
+export const SendMessageForm = ({
+  currentUserIsMember,
+  roomId,
+  addMessage,
+}: {
+  currentUserIsMember: boolean;
+  roomId: string;
+  addMessage(newMessage: Message): void;
+}) => {
   const form = useForm<z.infer<typeof sendMessageSchema>>({
     resolver: zodResolver(sendMessageSchema),
     defaultValues: {
@@ -39,7 +47,7 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
           setIsPending(true);
           const { data } = await axios.post<{ new_message: Message }>(MessageController.post.url({ roomId: roomId }), { text });
           resetField('text');
-          console.log(data.new_message);
+          addMessage(data.new_message);
         } catch (e) {
           if (e instanceof AxiosError) {
             const data = e.response?.data;

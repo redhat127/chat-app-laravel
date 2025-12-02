@@ -11,7 +11,7 @@ import { home } from '@/routes';
 import type { Message, Room } from '@/types';
 import { Deferred, Head, Link } from '@inertiajs/react';
 import { CircleAlert } from 'lucide-react';
-import { useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 export default function ShowRoom({
   roomData: {
@@ -19,7 +19,7 @@ export default function ShowRoom({
     currentUserIsCreator,
     currentUserIsMember,
   },
-  messages,
+  messages: serverMessages,
 }: {
   roomData: { room: { data: Room }; currentUserIsMember: boolean; currentUserIsCreator: boolean };
   messages?: { data: Message[] };
@@ -37,6 +37,13 @@ export default function ShowRoom({
     updateHeight();
     window.addEventListener('resize', updateHeight);
     return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+  const [messages, setMessages] = useState(serverMessages?.data);
+  useEffect(() => {
+    setMessages(serverMessages?.data);
+  }, [serverMessages?.data]);
+  const addMessage = useCallback((newMessage: Message) => {
+    setMessages((prev) => [...(prev || []), newMessage]);
   }, []);
   return (
     <>
@@ -78,10 +85,10 @@ export default function ShowRoom({
         <Card ref={messagesCardRef} className="py-4">
           <CardContent className="flex-1 overflow-y-auto">
             <Deferred data="messages" fallback={<MessageListSkeleton />}>
-              {messages?.data && <MessageList messages={messages.data} />}
+              {messages && <MessageList messages={messages} />}
             </Deferred>
           </CardContent>
-          <SendMessageForm currentUserIsMember={currentUserIsMember} roomId={room.id} />
+          <SendMessageForm currentUserIsMember={currentUserIsMember} roomId={room.id} addMessage={addMessage} />
         </Card>
       </div>
     </>

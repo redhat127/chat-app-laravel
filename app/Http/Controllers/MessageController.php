@@ -28,9 +28,9 @@ class MessageController extends Controller
             ], 403);
         }
 
-        $currentUserId = Auth::id();
+        $currentUser = Auth::user();
 
-        if (! $room->members()->where('member_id', $currentUserId)->exists()) {
+        if (! $room->members()->where('member_id', $currentUser->id)->exists()) {
             return response()->json([
                 'flashMessage' => ['type' => 'error', 'text' => 'You are not a member of this room.'],
             ], 400);
@@ -39,8 +39,10 @@ class MessageController extends Controller
         $message = $room->messages()->create([
             'text' => $validated['text'],
             'chat_room_id' => $room->id,
-            'user_id' => $currentUserId,
+            'user_id' => $currentUser->id,
         ]);
+
+        $message->setRelations(['user' => $currentUser]);
 
         return response()->json([
             'new_message' => new MessageResource($message),
