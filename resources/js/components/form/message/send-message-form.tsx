@@ -42,7 +42,7 @@ export const SendMessageForm = ({
   const isFormDisabled = isSubmitting || isPending;
   return (
     <form
-      className="mx-4"
+      className="fixed right-0 bottom-0 left-0 bg-white p-4 px-8"
       onSubmit={handleSubmit(async ({ text }) => {
         try {
           const socketId = echo().socketId();

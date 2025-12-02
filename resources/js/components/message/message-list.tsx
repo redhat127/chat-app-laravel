@@ -1,7 +1,19 @@
 import { cn } from '@/lib/utils';
 import type { Message } from '@/types';
+import { useCallback, useEffect, useRef } from 'react';
 
 export const MessageList = ({ messages }: { messages: Message[] }) => {
+  const endOfMessagesRef = useRef<HTMLDivElement>(null);
+
+  const scrollToLatestMessage = useCallback(() => {
+    if (!endOfMessagesRef.current) return;
+    endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    if (messages && messages.length > 0) scrollToLatestMessage();
+  }, [scrollToLatestMessage, messages]);
+
   return messages.length > 0 ? (
     <div className="flex flex-col gap-2">
       {messages.map((message) => {
@@ -27,6 +39,7 @@ export const MessageList = ({ messages }: { messages: Message[] }) => {
           </div>
         );
       })}
+      <div ref={endOfMessagesRef} />
     </div>
   ) : (
     <p className="text-sm text-muted-foreground italic">No message found.</p>
