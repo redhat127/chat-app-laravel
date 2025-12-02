@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import type { Message } from '@/types';
 
 export const MessageList = ({ messages }: { messages: Message[] }) => {
-  return (
+  return messages.length > 0 ? (
     <div className="flex flex-col gap-2">
       {messages.map((message) => {
         const className = {
@@ -28,5 +28,7 @@ export const MessageList = ({ messages }: { messages: Message[] }) => {
         );
       })}
     </div>
+  ) : (
+    <p className="text-sm text-muted-foreground italic">No message found.</p>
   );
 };
