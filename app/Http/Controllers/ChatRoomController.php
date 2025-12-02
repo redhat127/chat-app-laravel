@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChatRoom;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 
 class ChatRoomController extends Controller
@@ -107,24 +108,36 @@ class ChatRoomController extends Controller
 
     public function show(string $roomId)
     {
-        $room = ChatRoom::query()
-            ->whereKey($roomId)
-            ->public()
-            ->withCount('members')
-            ->firstOrFail();
-
-        $currentUserId = Auth::id();
-
-        $currentUserIsMember = $room->members()
-            ->where('member_id', $currentUserId)
-            ->exists();
-
-        $currentUserIsCreator = $room->user_id === $currentUserId;
-
         return inertia('room/show', [
-            'room' => $room->toResource(),
-            'currentUserIsMember' => $currentUserIsMember,
-            'currentUserIsCreator' => $currentUserIsCreator,
+            'roomData' => function () use ($roomId) {
+                $room = ChatRoom::query()
+                    ->whereKey($roomId)
+                    ->public()
+                    ->withCount('members')
+                    ->firstOrFail();
+
+                $currentUserId = Auth::id();
+
+                $currentUserIsMember = $room->members()
+                    ->where('member_id', $currentUserId)
+                    ->exists();
+
+                $currentUserIsCreator = $room->user_id === $currentUserId;
+
+                return [
+                    'room' => $room->toResource(),
+                    'currentUserIsMember' => $currentUserIsMember,
+                    'currentUserIsCreator' => $currentUserIsCreator,
+                ];
+            },
+            'messages' => inertia()->defer(
+                fn () => Message::where('chat_room_id', $roomId)
+                    ->oldest()
+                    ->with('user:id,name')
+                    ->get()
+                    ->toResourceCollection(),
+                'messages'
+            ),
         ]);
     }
 }

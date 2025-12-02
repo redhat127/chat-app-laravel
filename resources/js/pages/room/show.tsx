@@ -1,24 +1,28 @@
 import { JoinRoomForm } from '@/components/form/chat-room/join-room-form';
 import { SendMessageForm } from '@/components/form/message/send-message-form';
 import { BaseLayout } from '@/components/layout/base';
+import { MessageList } from '@/components/message/message-list';
+import { MessageListSkeleton } from '@/components/message/message-list-skeleton';
 import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn, generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
-import type { Room } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import type { Message, Room } from '@/types';
+import { Deferred, Head, Link } from '@inertiajs/react';
 import { CircleAlert } from 'lucide-react';
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 export default function ShowRoom({
-  room: { data: room },
-  currentUserIsMember,
-  currentUserIsCreator,
+  roomData: {
+    room: { data: room },
+    currentUserIsCreator,
+    currentUserIsMember,
+  },
+  messages,
 }: {
-  room: { data: Room };
-  currentUserIsMember: boolean;
-  currentUserIsCreator: boolean;
+  roomData: { room: { data: Room }; currentUserIsMember: boolean; currentUserIsCreator: boolean };
+  messages?: { data: Message[] };
 }) {
   const messagesCardOuterDivRef = useRef<HTMLDivElement>(null);
   const messagesCardRef = useRef<HTMLDivElement>(null);
@@ -72,7 +76,11 @@ export default function ShowRoom({
           </CardContent>
         </Card>
         <Card ref={messagesCardRef} className="py-4">
-          <CardContent className="flex-1 overflow-y-auto"></CardContent>
+          <CardContent className="flex-1 overflow-y-auto">
+            <Deferred data="messages" fallback={<MessageListSkeleton />}>
+              {messages?.data && <MessageList messages={messages.data} />}
+            </Deferred>
+          </CardContent>
           <SendMessageForm currentUserIsMember={currentUserIsMember} roomId={room.id} />
         </Card>
       </div>

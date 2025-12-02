@@ -24,6 +24,13 @@ export interface Message {
   text: string;
   chat_room_id: string;
   user_id: string;
+  created_at: string;
+  updated_at: string;
+  is_mine: boolean;
+  user: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export type flashMessage = {
