@@ -115,16 +115,16 @@ class ChatRoomController extends Controller
 
         $currentUserId = Auth::id();
 
-        $isCurrentUserMember = $room->members()
+        $currentUserIsMember = $room->members()
             ->where('member_id', $currentUserId)
             ->exists();
 
-        $isRoomCreator = $room->user_id === $currentUserId;
+        $currentUserIsCreator = $room->user_id === $currentUserId;
 
         return inertia('room/show', [
             'room' => $room->toResource(),
-            'isCurrentUserMember' => $isCurrentUserMember,
-            'isRoomCreator' => $isRoomCreator,
+            'currentUserIsMember' => $currentUserIsMember,
+            'currentUserIsCreator' => $currentUserIsCreator,
         ]);
     }
 }
