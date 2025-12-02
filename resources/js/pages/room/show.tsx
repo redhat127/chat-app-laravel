@@ -71,6 +71,18 @@ export default function ShowRoom({
     return () => leave();
   }, [leave]);
 
+  const messageCardContentRef = useRef<HTMLDivElement>(null);
+
+  const messageCardContentScrollToBottom = useCallback(() => {
+    const messageCardContent = messageCardContentRef.current;
+    if (!messageCardContent) return;
+    messageCardContent.scrollTo({ top: messageCardContent.scrollHeight, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    if (messages && messages.length > 0) messageCardContentScrollToBottom();
+  }, [messageCardContentScrollToBottom, messages]);
+
   return (
     <>
       <Head>
@@ -103,13 +115,13 @@ export default function ShowRoom({
                 <JoinRoomForm roomId={room.id} btnClassName="w-auto" />
               )
             ) : null}
-            <Link href={home()} className={cn('block text-sm underline underline-offset-4', { 'mt-4': !currentUserIsCreator })}>
+            <Link href={home()} className={cn('inline-block text-sm underline underline-offset-4', { 'mt-4': !currentUserIsCreator })}>
               Back to chat rooms
             </Link>
           </CardContent>
         </Card>
         <Card ref={messagesCardRef} className="py-4">
-          <CardContent className="flex-1 overflow-y-auto">
+          <CardContent className="flex-1 overflow-y-auto" ref={messageCardContentRef}>
             <Deferred data="messages" fallback={<MessageListSkeleton />}>
               {messages && <MessageList messages={messages} />}
             </Deferred>
