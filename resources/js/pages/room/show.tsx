@@ -1,4 +1,5 @@
 import { JoinRoomForm } from '@/components/form/chat-room/join-room-form';
+import { SendMessageForm } from '@/components/form/message/send-message-form';
 import { BaseLayout } from '@/components/layout/base';
 import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,7 @@ import { home } from '@/routes';
 import type { Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { CircleAlert } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 export default function ShowRoom({
   room: { data: room },
@@ -19,12 +20,26 @@ export default function ShowRoom({
   currentUserIsMember: boolean;
   currentUserIsCreator: boolean;
 }) {
+  const messagesCardOuterDivRef = useRef<HTMLDivElement>(null);
+  const messagesCardRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const messagesCardOuterDiv = messagesCardOuterDivRef.current;
+    const messagesCard = messagesCardRef.current;
+    if (!messagesCard || !messagesCardOuterDiv) return;
+    const updateHeight = () => {
+      const outerDivPaddingTop = parseFloat(getComputedStyle(messagesCardOuterDiv).paddingTop);
+      messagesCard.style.height = `${window.innerHeight - messagesCard.getBoundingClientRect().top - outerDivPaddingTop}px`;
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
   return (
     <>
       <Head>
         <title>{generateTitle(room.name)}</title>
       </Head>
-      <div className="space-y-4 p-4 px-8">
+      <div className="space-y-4 p-4 px-8" ref={messagesCardOuterDivRef}>
         <Card>
           <CardHeader>
             <CardTitle>
@@ -55,6 +70,10 @@ export default function ShowRoom({
               Back to chat rooms
             </Link>
           </CardContent>
+        </Card>
+        <Card ref={messagesCardRef} className="py-4">
+          <CardContent className="flex-1 overflow-y-auto"></CardContent>
+          <SendMessageForm currentUserIsMember={currentUserIsMember} roomId={room.id} />
         </Card>
       </div>
     </>

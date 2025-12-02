@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatRoomController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -48,5 +49,12 @@ Route::middleware('auth')
                 Route::post('/join-room', 'joinRoom')->name('joinRoom');
                 Route::post('/leave-room', 'leaveRoom')->name('leaveRoom');
                 Route::get('/{roomId}', 'show')->name('show');
+            });
+
+        Route::prefix('message')
+            ->name('message.')
+            ->controller(MessageController::class)
+            ->group(function () {
+                Route::post('/{roomId}', 'post')->name('post');
             });
     });

@@ -19,6 +19,13 @@ export interface Room {
   members_count: number;
 }
 
+export interface Message {
+  id: string;
+  text: string;
+  chat_room_id: string;
+  user_id: string;
+}
+
 export type flashMessage = {
   type: 'error' | 'success';
   text: string;
