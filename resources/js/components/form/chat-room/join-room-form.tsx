@@ -12,7 +12,7 @@ export const JoinRoomForm = ({ roomId, useAsDropDownMenuItem = false }: { roomId
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const queryClient = useQueryClient();
   const user = useUser()!;
-  const btnClassName = cn('w-full', { 'flex items-center gap-1.5': useAsDropDownMenuItem });
+  const btnClassName = cn('w-full', { 'flex items-center gap-1.5 px-2 py-1.5': useAsDropDownMenuItem });
   return (
     <form
       className="w-full"

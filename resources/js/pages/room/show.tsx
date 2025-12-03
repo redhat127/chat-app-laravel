@@ -115,6 +115,7 @@ export default function ShowRoom({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
+                  className="p-0"
                   onSelect={(e) => {
                     e.preventDefault();
                     if (currentUserIsCreator) {
@@ -130,7 +131,7 @@ export default function ShowRoom({
                       <JoinRoomForm roomId={room.id} useAsDropDownMenuItem />
                     )
                   ) : (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 px-2 py-1.5">
                       <UserPlus className="text-inherit" />
                       Invite users
                     </div>
