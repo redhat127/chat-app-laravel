@@ -44,7 +44,7 @@ export default function ShowRoom({
       <Head>
         <title>{generateTitle(room.name)}</title>
       </Head>
-      <div className="mb-38 space-y-4 p-4 px-8">
+      <div className="mb-48 space-y-4 p-4 px-8">
         <Card className="rounded-md py-2">
           <CardHeader className="flex items-center justify-between gap-4">
             <div>

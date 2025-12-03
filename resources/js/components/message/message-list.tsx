@@ -58,7 +58,7 @@ const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
             <UserAvatar avatar={message.user.avatar} name={message.user.name} />
             <div className="space-y-0.5">
               <p className={cn('text-xs italic', pClassName)}>{message.user.name}:</p>
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
               <p className={cn('text-xs italic', pClassName)}>{messageCreatedAt}</p>
             </div>
           </div>

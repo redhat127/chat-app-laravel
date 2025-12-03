@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { LoadingSwap } from '@/components/ui/loading-swap';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import type { Message } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { echo } from '@laravel/echo-react';
@@ -13,7 +14,10 @@ import { toast } from 'sonner';
 import z from 'zod';
 
 const sendMessageSchema = z.object({
-  text: z.string().trim().min(1, 'text is required.').max(160, 'text is too long.'),
+  text: z
+    .string()
+    .max(160, 'text is too long.')
+    .refine((val) => val.trim().length > 0, 'text is required.'),
 });
 
 const sendMessageFn = async (text: string, roomId: string, socketId: string) => {
@@ -42,6 +46,7 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
     formState: { isSubmitting },
     resetField,
     setError,
+    watch,
   } = form;
   const { mutate: sendMessage, isPending } = useMutation({
     mutationKey: ['send-message'],
@@ -51,56 +56,57 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
   });
   const isFormDisabled = isSubmitting || isPending;
   const queryClient = useQueryClient();
-  return (
-    <form
-      className="fixed right-0 bottom-0 left-0 bg-white p-4 px-8"
-      onSubmit={handleSubmit(async ({ text }) => {
-        const socketId = echo().socketId();
-        if (!socketId || !currentUserIsMember) return;
-        sendMessage(
-          { text, roomId, socketId },
-          {
-            onSuccess({ new_message }) {
-              resetField('text');
-              queryClient.setQueryData<Message[]>(['messages', { roomId }], (messages = []) => {
-                return [...messages, new_message];
-              });
-            },
-            onError(e) {
-              if (e instanceof AxiosError) {
-                const data = e.response?.data;
-                if (e.status === 422) {
-                  const result = z.object({ errors: z.object({ text: z.array(z.string()).optional() }) }).safeParse(data);
-                  if (result.success) {
-                    const message = result.data.errors.text?.[0];
-                    if (message) {
-                      setError('text', { message });
-                    }
-                  }
-                  return;
+  const onSubmitHandler = handleSubmit(async ({ text }) => {
+    const socketId = echo().socketId();
+    if (!socketId || !currentUserIsMember) return;
+    sendMessage(
+      { text, roomId, socketId },
+      {
+        onSuccess({ new_message }) {
+          resetField('text');
+          queryClient.setQueryData<Message[]>(['messages', { roomId }], (messages = []) => {
+            return [...messages, new_message];
+          });
+        },
+        onError(e) {
+          if (e instanceof AxiosError) {
+            const data = e.response?.data;
+            if (e.status === 422) {
+              const result = z.object({ errors: z.object({ text: z.array(z.string()).optional() }) }).safeParse(data);
+              if (result.success) {
+                const message = result.data.errors.text?.[0];
+                if (message) {
+                  setError('text', { message });
                 }
-                if ('flashMessage' in data) {
-                  const result = z
-                    .object({
-                      flashMessage: z.object({
-                        type: z.literal(['error']),
-                        text: z.string(),
-                      }),
-                    })
-                    .safeParse(data);
-                  if (result.success) {
-                    const { flashMessage } = result.data;
-                    toast[flashMessage.type](flashMessage.text);
-                  }
-                  return;
-                }
-                toast.error('Something went wrong. Please try again.');
               }
-            },
-          },
-        );
-      })}
-    >
+              return;
+            }
+            if ('flashMessage' in data) {
+              const result = z
+                .object({
+                  flashMessage: z.object({
+                    type: z.literal(['error']),
+                    text: z.string(),
+                  }),
+                })
+                .safeParse(data);
+              if (result.success) {
+                const { flashMessage } = result.data;
+                toast[flashMessage.type](flashMessage.text);
+              }
+              return;
+            }
+            toast.error('Something went wrong. Please try again.');
+          }
+        },
+      },
+    );
+  });
+
+  const textCharactersRemaining = 160 - watch('text').length;
+
+  return (
+    <form className="fixed right-0 bottom-0 left-0 bg-white p-4 px-8" onSubmit={onSubmitHandler}>
       <FieldGroup className="gap-4">
         <Controller
           control={control}
@@ -114,7 +120,17 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
                   autoComplete="on"
                   placeholder="Type something..."
                   disabled={!currentUserIsMember}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      onSubmitHandler();
+                    }
+                  }}
+                  className="max-h-0"
                 />
+                <p className={cn('text-sm text-muted-foreground italic', { 'text-red-600': textCharactersRemaining < 0 })}>
+                  remaining characters: {textCharactersRemaining}
+                </p>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
