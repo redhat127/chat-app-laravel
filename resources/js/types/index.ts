@@ -27,10 +27,7 @@ export interface Message {
   created_at: string;
   updated_at: string;
   is_mine: boolean;
-  user: {
-    id: string;
-    name: string;
-  } | null;
+  user: Pick<User, 'id' | 'name' | 'avatar'>;
 }
 
 export type flashMessage = {

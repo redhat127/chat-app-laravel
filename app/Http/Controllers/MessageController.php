@@ -36,7 +36,7 @@ class MessageController extends Controller
         return response()->json([
             'messages' => Message::where('chat_room_id', $roomId)
                 ->oldest()
-                ->with('user:id,name')
+                ->with('user:id,name,avatar')
                 ->get()
                 ->toResourceCollection(),
         ]);

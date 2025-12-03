@@ -9,10 +9,13 @@ export const MessageListSkeleton = ({ count = 4 }: { count?: number }) => {
         const className = isMine ? 'self-end bg-sky-600' : 'self-start border bg-gray-100';
         const skeletonClassName = isMine ? 'bg-sky-500' : 'bg-gray-300';
         return (
-          <div key={`skeleton-${idx}`} className={cn('space-y-1 rounded-md px-4 py-2', className)}>
-            <Skeleton className={cn('h-3 w-10 rounded', skeletonClassName)} />
-            <Skeleton className={cn('h-4 w-20 rounded', skeletonClassName)} />
-            <Skeleton className={cn('h-3 w-10 rounded', skeletonClassName)} />
+          <div key={`skeleton-${idx}`} className={cn('flex gap-2 rounded-md p-2 pr-4', className)}>
+            <Skeleton className={cn('h-8 w-8 rounded-full', skeletonClassName)} />
+            <div className="space-y-0.5">
+              <Skeleton className={cn('h-3 w-10 rounded', skeletonClassName)} />
+              <Skeleton className={cn('h-4 w-20 rounded', skeletonClassName)} />
+              <Skeleton className={cn('h-3 w-10 rounded', skeletonClassName)} />
+            </div>
           </div>
         );
       })}

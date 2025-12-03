@@ -5,6 +5,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Suspense, useCallback, useEffect, useRef } from 'react';
 import { ReactQueryResetBoundary } from '../react-query-reset-boundary';
+import { UserAvatar } from '../user-avatar';
 import { MessageListSkeleton } from './message-list-skeleton';
 
 const getRoomMessages = async (roomId: string, signal: AbortSignal) => {
@@ -53,10 +54,13 @@ const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
           minute: '2-digit',
         });
         return (
-          <div key={message.id} className={cn('max-w-1/2 space-y-1 rounded-md px-4 py-2', className)}>
-            {message.user && <p className={cn('text-xs italic', pClassName)}>{message.user.name}:</p>}
-            <p className="text-sm">{message.text}</p>
-            <p className={cn('text-xs italic', pClassName)}>{messageCreatedAt}</p>
+          <div key={message.id} className={cn('flex max-w-1/2 gap-2 rounded-md p-2 pr-4', className)}>
+            <UserAvatar avatar={message.user.avatar} name={message.user.name} />
+            <div className="space-y-0.5">
+              <p className={cn('text-xs italic', pClassName)}>{message.user.name}:</p>
+              <p className="text-sm">{message.text}</p>
+              <p className={cn('text-xs italic', pClassName)}>{messageCreatedAt}</p>
+            </div>
           </div>
         );
       })}

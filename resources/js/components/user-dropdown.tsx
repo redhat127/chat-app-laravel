@@ -12,23 +12,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { UserAvatar } from './user-avatar';
 
 export const UserDropdown = ({ user: { name, avatar, email } }: { user: IUser }) => {
   const userInitials = useMemo(() => {
-    return (
-      <div className="h-8 w-8 overflow-hidden rounded-full">
-        {avatar ? (
-          <img src={avatar} alt={`${name} avatar`} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-orange-600 text-white capitalize">{name[0]}</div>
-        )}
-      </div>
-    );
+    return <UserAvatar avatar={avatar} name={name} />;
   }, [avatar, name]);
   const [open, setOpen] = useState(false);
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger>{userInitials}</DropdownMenuTrigger>
+      <DropdownMenuTrigger>
+        <UserAvatar avatar={avatar} name={name} />
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel className="flex items-center gap-2">
           {userInitials}
