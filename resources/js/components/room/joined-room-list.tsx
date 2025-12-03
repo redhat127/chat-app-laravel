@@ -7,17 +7,19 @@ import { ReactQueryResetBoundary } from '../react-query-reset-boundary';
 import { RoomList } from './room-list';
 import { RoomListSkeleton } from './room-list-skeleton';
 
-const getJoinedRoomList = async () => {
+const getJoinedRoomList = async (signal: AbortSignal) => {
   const {
     data: { joined_room_list },
-  } = await axios.get<{ joined_room_list: Room[] }>(room.joinedRoomList.url());
+  } = await axios.get<{ joined_room_list: Room[] }>(room.joinedRoomList.url(), {
+    signal,
+  });
   return joined_room_list;
 };
 
 export const JoinedRoomListSuspenseQuery = ({ user }: { user: User }) => {
   const { data: rooms } = useSuspenseQuery({
     queryKey: ['joined-room-list', { userId: user.id }],
-    queryFn: getJoinedRoomList,
+    queryFn: ({ signal }) => getJoinedRoomList(signal),
     staleTime: 1000 * 60 * 60 * 24,
   });
   return rooms.length > 0 ? (
