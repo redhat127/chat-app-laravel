@@ -4,9 +4,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { LoadingSwap } from '@/components/ui/loading-swap';
+import { useUser } from '@/hooks/use-user';
 import { setServerValidationErrors } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import z from 'zod';
@@ -39,6 +41,8 @@ export const CreateChatRoomForm = () => {
   } = form;
   const [isPending, setIsPending] = useState(false);
   const isFormDisabled = isSubmitting || isPending;
+  const queryClient = useQueryClient();
+  const user = useUser()!;
   return (
     <form
       className="max-w-lg"
@@ -54,6 +58,24 @@ export const CreateChatRoomForm = () => {
           },
           onError(errors) {
             setServerValidationErrors(errors, setError);
+          },
+          onSuccess() {
+            queryClient.refetchQueries({
+              predicate(query) {
+                const key = query.queryKey;
+
+                if (!Array.isArray(key) || key.length < 2) return false;
+
+                const [primary, params] = key;
+
+                const isTargetPrimary = ['joined-room-list', 'public-room-list'].includes(primary);
+                if (!isTargetPrimary) return false;
+
+                if (typeof params !== 'object' || params === null) return false;
+
+                return params.userId === user.id;
+              },
+            });
           },
         });
       })}

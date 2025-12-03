@@ -13,6 +13,34 @@ class ChatRoomController extends Controller
         return inertia('room/create');
     }
 
+    public function joinedRoomList()
+    {
+        $currentUser = Auth::user();
+
+        return response()->json([
+            'joined_room_list' => $currentUser
+                ->rooms()
+                ->latest()
+                ->withCount('members')
+                ->get()
+                ->toResourceCollection(),
+        ]);
+    }
+
+    public function publicRoomList()
+    {
+        return response()->json([
+            'public_room_list' => ChatRoom::latest()
+                ->public()
+                ->whereDoesntHave('members', function ($query) {
+                    $query->where('member_id', Auth::id());
+                })
+                ->withCount('members')
+                ->get()
+                ->toResourceCollection(),
+        ]);
+    }
+
     public function createRoomPost()
     {
         $validated = request()->validate([

@@ -44,6 +44,8 @@ Route::middleware('auth')
             ->name('room.')
             ->controller(ChatRoomController::class)
             ->group(function () {
+                Route::get('/joined-room-list', 'joinedRoomList')->name('joinedRoomList');
+                Route::get('/public-room-list', 'publicRoomList')->name('publicRoomList');
                 Route::get('/create', 'createRoom')->name('createRoom');
                 Route::post('/create', 'createRoomPost')->name('createRoomPost');
                 Route::post('/join-room', 'joinRoom')->name('joinRoom');

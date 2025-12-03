@@ -1,33 +1,20 @@
 import ChatRoomController from '@/actions/App/Http/Controllers/ChatRoomController';
 import { LoginForm } from '@/components/form/login-form';
 import { BaseLayout } from '@/components/layout/base';
-import { RoomList } from '@/components/room/room-list';
+import { JoinedRoomList } from '@/components/room/joined-room-list';
+import { PublicRoomList } from '@/components/room/public-room-list';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@/hooks/use-user';
 import { GithubIcon } from '@/icons/github';
 import { GoogleIcon } from '@/icons/google';
 import { generateTitle } from '@/lib/utils';
 import login from '@/routes/login';
-import type { Room } from '@/types';
-import { Deferred, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
-const RoomListSkeleton = () => {
-  return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
-      {[...Array(4)].map((_, i) => (
-        <Skeleton key={i} className="h-40 w-full rounded-lg" />
-      ))}
-    </div>
-  );
-};
-
-export default function Home(props: { publicRooms?: { data: Room[] } | null; joinedRooms?: { data: Room[] } } | null) {
+export default function Home() {
   const user = useUser();
-  const publicRooms = props?.publicRooms?.data;
-  const joinedRooms = props?.joinedRooms?.data;
   return (
     <>
       <Head>
@@ -86,13 +73,7 @@ export default function Home(props: { publicRooms?: { data: Room[] } | null; joi
               <CardDescription>Rooms you're currently a member of</CardDescription>
             </CardHeader>
             <CardContent>
-              <Deferred data="joinedRooms" fallback={RoomListSkeleton}>
-                {joinedRooms && joinedRooms.length > 0 ? (
-                  <RoomList rooms={joinedRooms} forJoinedRooms user={user} />
-                ) : (
-                  <p className="text-sm text-muted-foreground">No room found.</p>
-                )}
-              </Deferred>
+              <JoinedRoomList user={user} />
             </CardContent>
           </Card>
           <Card className="gap-4">
@@ -103,13 +84,7 @@ export default function Home(props: { publicRooms?: { data: Room[] } | null; joi
               <CardDescription>Join public rooms from the community</CardDescription>
             </CardHeader>
             <CardContent>
-              <Deferred data="publicRooms" fallback={RoomListSkeleton}>
-                {publicRooms && publicRooms.length > 0 ? (
-                  <RoomList rooms={publicRooms.filter((room) => !joinedRooms?.some((r) => r.id === room.id))} />
-                ) : (
-                  <p className="text-sm text-muted-foreground">No room found.</p>
-                )}
-              </Deferred>
+              <PublicRoomList userId={user.id} />
             </CardContent>
           </Card>
         </div>
