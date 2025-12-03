@@ -13,18 +13,20 @@ export default function CreateRoom() {
         <title>{generateTitle('Create Room')}</title>
       </Head>
       <div className="space-y-4 p-4 px-8">
-        <Card>
-          <CardHeader>
+        <Card className="gap-4 py-4">
+          <CardHeader className="gap-1">
             <CardTitle>
-              <h1 className="text-2xl font-bold">Create a new Room</h1>
+              <h1 className="font-bold">Create a new Room</h1>
             </CardTitle>
             <CardDescription>Use form below to create a new chat room</CardDescription>
+            <p>
+              <Link href={home()} className="text-sm text-muted-foreground underline underline-offset-4">
+                Back to chat rooms
+              </Link>
+            </p>
           </CardHeader>
           <CardContent>
             <CreateChatRoomForm />
-            <Link href={home()} className="mt-4 block text-sm underline underline-offset-4">
-              Back to chat rooms
-            </Link>
           </CardContent>
         </Card>
       </div>

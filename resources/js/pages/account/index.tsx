@@ -4,7 +4,8 @@ import { BaseLayout } from '@/components/layout/base';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUser } from '@/hooks/use-user';
 import { generateTitle } from '@/lib/utils';
-import { Head } from '@inertiajs/react';
+import { home } from '@/routes';
+import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
 export default function AccountIndex() {
@@ -15,17 +16,22 @@ export default function AccountIndex() {
         <title>{generateTitle('Account')}</title>
       </Head>
       <div className="space-y-4 p-4 px-8">
-        <Card>
-          <CardHeader className="gap-0">
+        <Card className="gap-4 py-4">
+          <CardHeader className="gap-1">
             <CardTitle>
-              <h1 className="text-2xl font-bold">Account</h1>
+              <h1 className="font-bold">Account</h1>
             </CardTitle>
+            <p>
+              <Link href={home()} className="text-sm font-normal text-muted-foreground underline underline-offset-4">
+                Back to chat rooms
+              </Link>
+            </p>
           </CardHeader>
         </Card>
-        <Card>
-          <CardHeader>
+        <Card className="gap-4 py-4">
+          <CardHeader className="gap-1">
             <CardTitle>
-              <h2 className="text-xl font-bold">Profile Details</h2>
+              <h2 className="font-bold">Profile Details</h2>
             </CardTitle>
             <CardDescription>Use form below to update your profile details</CardDescription>
           </CardHeader>
@@ -34,10 +40,10 @@ export default function AccountIndex() {
           </CardContent>
         </Card>
         {user.is_password_null && (
-          <Card>
-            <CardHeader>
+          <Card className="gap-4 py-4">
+            <CardHeader className="gap-1">
               <CardTitle>
-                <h2 className="text-xl font-bold">Set Password</h2>
+                <h2 className="font-bold">Set Password</h2>
               </CardTitle>
               <CardDescription>Use form below to set password for your account</CardDescription>
             </CardHeader>

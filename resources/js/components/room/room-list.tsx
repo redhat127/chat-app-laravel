@@ -10,10 +10,10 @@ export const RoomList = ({ rooms, forJoinedRooms = false, user }: { rooms: Room[
   return (
     <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
       {rooms.map((room) => (
-        <Card key={room.id}>
-          <CardHeader>
+        <Card className="gap-4 py-4" key={room.id}>
+          <CardHeader className="gap-1">
             <CardTitle>
-              <h3 className="text-lg font-bold capitalize">{room.name}</h3>
+              <h3 className="font-bold capitalize">{room.name}</h3>
             </CardTitle>
             <CardDescription>
               {room.members_count} {room.members_count === 1 ? 'member' : 'members'}

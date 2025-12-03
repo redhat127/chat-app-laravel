@@ -5,15 +5,17 @@ import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { DoorClosed } from 'lucide-react';
 import { useState } from 'react';
 
-export const LeaveRoomForm = ({ roomId, btnClassName = '' }: { roomId: string; btnClassName?: string }) => {
+export const LeaveRoomForm = ({ roomId, useAsDropDownMenuItem = false }: { roomId: string; useAsDropDownMenuItem?: boolean }) => {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const queryClient = useQueryClient();
   const user = useUser()!;
+  const btnClassName = cn('w-full', { 'flex items-center gap-1.5 text-red-600': useAsDropDownMenuItem });
   return (
     <form
-      className="max-w-lg"
+      className="w-full"
       onSubmit={(e) => {
         e.preventDefault();
         router.post(
@@ -50,9 +52,16 @@ export const LeaveRoomForm = ({ roomId, btnClassName = '' }: { roomId: string; b
         );
       }}
     >
-      <Button type="submit" disabled={isFormDisabled} className={cn('w-full', btnClassName)} variant="destructive">
-        <LoadingSwap isLoading={isFormDisabled}>Leave</LoadingSwap>
-      </Button>
+      {useAsDropDownMenuItem ? (
+        <button type="submit" disabled={isFormDisabled} className={btnClassName}>
+          <DoorClosed className="text-inherit" />
+          Leave
+        </button>
+      ) : (
+        <Button type="submit" disabled={isFormDisabled} className={btnClassName} variant="destructive">
+          <LoadingSwap isLoading={isFormDisabled}>Leave</LoadingSwap>
+        </Button>
+      )}
     </form>
   );
 };

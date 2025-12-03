@@ -23,10 +23,10 @@ export default function Home() {
       {!user ? (
         <div className="flex min-h-screen items-center justify-center">
           <div className="w-full p-4 px-8">
-            <Card className="mx-auto max-w-md">
-              <CardHeader>
+            <Card className="mx-auto max-w-sm gap-4 py-4">
+              <CardHeader className="gap-1">
                 <CardTitle>
-                  <h1 className="text-2xl font-bold">Login</h1>
+                  <h1 className="font-bold">Login</h1>
                 </CardTitle>
                 <CardDescription>Use your email and password to login</CardDescription>
               </CardHeader>
@@ -52,10 +52,10 @@ export default function Home() {
         </div>
       ) : (
         <div className="space-y-4 p-4 px-8">
-          <Card className="gap-4">
-            <CardHeader>
+          <Card className="gap-4 py-4">
+            <CardHeader className="gap-1">
               <CardTitle>
-                <h1 className="text-2xl font-bold">Chat Rooms</h1>
+                <h1 className="font-bold">Chat Rooms</h1>
               </CardTitle>
               <CardDescription>View all public rooms and rooms you’ve joined</CardDescription>
             </CardHeader>
@@ -65,10 +65,10 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
-          <Card className="gap-4">
-            <CardHeader>
+          <Card className="gap-4 py-4">
+            <CardHeader className="gap-1">
               <CardTitle>
-                <h2 className="text-xl font-bold">Joined Rooms</h2>
+                <h2 className="font-bold">Joined Rooms</h2>
               </CardTitle>
               <CardDescription>Rooms you're currently a member of</CardDescription>
             </CardHeader>
@@ -76,10 +76,10 @@ export default function Home() {
               <JoinedRoomList user={user} />
             </CardContent>
           </Card>
-          <Card className="gap-4">
-            <CardHeader>
+          <Card className="gap-4 py-4">
+            <CardHeader className="gap-1">
               <CardTitle>
-                <h2 className="text-xl font-bold">Public Rooms</h2>
+                <h2 className="font-bold">Public Rooms</h2>
               </CardTitle>
               <CardDescription>Join public rooms from the community</CardDescription>
             </CardHeader>

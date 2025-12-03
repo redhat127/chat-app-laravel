@@ -5,15 +5,17 @@ import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { DoorOpen } from 'lucide-react';
 import { useState } from 'react';
 
-export const JoinRoomForm = ({ roomId, btnClassName = '' }: { roomId: string; btnClassName?: string }) => {
+export const JoinRoomForm = ({ roomId, useAsDropDownMenuItem = false }: { roomId: string; useAsDropDownMenuItem?: boolean }) => {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const queryClient = useQueryClient();
   const user = useUser()!;
+  const btnClassName = cn('w-full', { 'flex items-center gap-1.5': useAsDropDownMenuItem });
   return (
     <form
-      className="max-w-lg"
+      className="w-full"
       onSubmit={(e) => {
         e.preventDefault();
         router.post(
@@ -50,9 +52,16 @@ export const JoinRoomForm = ({ roomId, btnClassName = '' }: { roomId: string; bt
         );
       }}
     >
-      <Button type="submit" disabled={isFormDisabled} className={cn('w-full', btnClassName)}>
-        <LoadingSwap isLoading={isFormDisabled}>Join</LoadingSwap>
-      </Button>
+      {useAsDropDownMenuItem ? (
+        <button type="submit" disabled={isFormDisabled} className={btnClassName}>
+          <DoorOpen />
+          Join
+        </button>
+      ) : (
+        <Button type="submit" disabled={isFormDisabled} className={btnClassName}>
+          <LoadingSwap isLoading={isFormDisabled}>Join</LoadingSwap>
+        </Button>
+      )}
     </form>
   );
 };
