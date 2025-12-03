@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
 import type { Message, Room } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
@@ -26,19 +26,16 @@ export default function ShowRoom({
   currentUserIsCreator: boolean;
 }) {
   const queryClient = useQueryClient();
-  const { leave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
+  const { listen, leave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
     queryClient.setQueryData<Message[]>(['messages', { roomId: room.id }], (messages = []) => {
       return [...messages, data.new_message];
     });
   });
 
   useEffect(() => {
-    return router.on('success', function (event) {
-      if (event.detail.page.url !== window.location.pathname) {
-        leave();
-      }
-    });
-  }, [leave]);
+    listen();
+    return () => leave();
+  }, [leave, listen]);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
