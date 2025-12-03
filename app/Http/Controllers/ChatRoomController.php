@@ -12,6 +12,29 @@ class ChatRoomController extends Controller
         return inertia('room/create');
     }
 
+    public function joinWithInvitation(string $roomId)
+    {
+        $room = ChatRoom::find($roomId);
+
+        $currentUserId = Auth::id();
+
+        if (! $room || ! $room->is_public) {
+            return redirect()->route('home');
+        }
+
+        if ($currentUserId === $room->user_id || $room->members()->where('member_id', $currentUserId)->exists()) {
+            return redirect()->route('room.show', ['roomId' => $room->id]);
+        }
+
+        $room->members()->attach($currentUserId);
+
+        return redirect()->route('room.show', ['roomId' => $room->id])
+            ->with('flashMessage', [
+                'type' => 'success',
+                'text' => 'You have successfully joined the room "'.str($room->name)->limit(preserveWords: true).'".',
+            ]);
+    }
+
     public function joinedRoomList()
     {
         $currentUser = Auth::user();

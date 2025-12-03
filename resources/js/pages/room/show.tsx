@@ -2,6 +2,7 @@ import { JoinRoomForm } from '@/components/form/chat-room/join-room-form';
 import { SendMessageForm } from '@/components/form/message/send-message-form';
 import { BaseLayout } from '@/components/layout/base';
 import { MessageList } from '@/components/message/message-list';
+import { InviteUserModal } from '@/components/room/invite-users-dialog';
 import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -12,8 +13,8 @@ import type { Message, Room } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { CircleAlert, Ellipsis } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 export default function ShowRoom({
   room: { data: room },
@@ -38,6 +39,9 @@ export default function ShowRoom({
       }
     });
   }, [leave]);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <>
@@ -69,26 +73,40 @@ export default function ShowRoom({
                 </Link>
               </p>
             </div>
-            {!currentUserIsCreator ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Ellipsis />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    {currentUserIsMember ? (
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+              <DropdownMenuTrigger>
+                <Ellipsis />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    if (currentUserIsCreator) {
+                      setIsDialogOpen(true);
+                      setIsDropdownOpen(false);
+                    }
+                  }}
+                >
+                  {!currentUserIsCreator ? (
+                    currentUserIsMember ? (
                       <LeaveRoomForm roomId={room.id} useAsDropDownMenuItem />
                     ) : (
                       <JoinRoomForm roomId={room.id} useAsDropDownMenuItem />
-                    )}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
+                    )
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <UserPlus className="text-inherit" />
+                      Invite users
+                    </div>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </CardHeader>
         </Card>
         <MessageList roomId={room.id} />
       </div>
+      <InviteUserModal roomId={room.id} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <SendMessageForm currentUserIsMember={currentUserIsMember} roomId={room.id} />
     </>
   );
