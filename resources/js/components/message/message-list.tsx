@@ -1,8 +1,27 @@
 import { cn } from '@/lib/utils';
+import message from '@/routes/message';
 import type { Message } from '@/types';
-import { useCallback, useEffect, useRef } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { Suspense, useCallback, useEffect, useRef } from 'react';
+import { ReactQueryResetBoundary } from '../react-query-reset-boundary';
+import { MessageListSkeleton } from './message-list-skeleton';
 
-export const MessageList = ({ messages }: { messages: Message[] }) => {
+const getRoomMessages = async (roomId: string, signal: AbortSignal) => {
+  const {
+    data: { messages },
+  } = await axios.get<{ messages: Message[] }>(message.index.url({ roomId }), {
+    signal,
+  });
+  return messages;
+};
+
+const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
+  const { data: messages } = useSuspenseQuery({
+    queryKey: ['messages', { roomId }],
+    queryFn: ({ signal }) => getRoomMessages(roomId, signal),
+    staleTime: 1000 * 10,
+  });
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
 
   const scrollToLatestMessage = useCallback(() => {
@@ -11,8 +30,10 @@ export const MessageList = ({ messages }: { messages: Message[] }) => {
   }, []);
 
   useEffect(() => {
-    if (messages && messages.length > 0) scrollToLatestMessage();
-  }, [scrollToLatestMessage, messages]);
+    if (messages.length > 0) {
+      scrollToLatestMessage();
+    }
+  }, [messages, scrollToLatestMessage]);
 
   return messages.length > 0 ? (
     <div className="flex flex-col gap-2">
@@ -43,5 +64,15 @@ export const MessageList = ({ messages }: { messages: Message[] }) => {
     </div>
   ) : (
     <p className="text-sm text-muted-foreground italic">No message found.</p>
+  );
+};
+
+export const MessageList = ({ roomId }: { roomId: string }) => {
+  return (
+    <ReactQueryResetBoundary errorText="Failed to get messages.">
+      <Suspense fallback={<MessageListSkeleton />}>
+        <MessageListSuspenseQuery roomId={roomId} />
+      </Suspense>
+    </ReactQueryResetBoundary>
   );
 };

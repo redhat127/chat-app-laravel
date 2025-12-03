@@ -25,7 +25,7 @@ class MessageResource extends JsonResource
                 'updated_at',
             ]),
             'is_mine' => $this->user_id === Auth::id(),
-            'user' => $this->whenLoaded('user'),
+            'user' => $this->whenLoaded('user', fn () => $this->user->only(['id', 'name'])),
         ];
     }
 }

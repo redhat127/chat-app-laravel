@@ -57,6 +57,7 @@ Route::middleware('auth')
             ->name('message.')
             ->controller(MessageController::class)
             ->group(function () {
+                Route::get('/{roomId}', 'index')->name('index');
                 Route::post('/{roomId}', 'post')->name('post');
             });
     });

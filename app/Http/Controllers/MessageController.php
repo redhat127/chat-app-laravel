@@ -5,15 +5,58 @@ namespace App\Http\Controllers;
 use App\Events\BroadcastMessageEvent;
 use App\Http\Resources\MessageResource;
 use App\Models\ChatRoom;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class MessageController extends Controller
 {
+    public function index(string $roomId)
+    {
+        $validator = Validator::make([
+            'roomId' => $roomId,
+        ], [
+            'roomId' => [
+                'bail',
+                'required',
+                'string',
+                'ulid',
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            throw ValidationException::withMessages([
+                'roomId' => $validator->errors()->first('roomId'),
+            ]);
+        }
+
+        $roomId = $validator->safe()->only(['roomId'])['roomId'];
+
+        return response()->json([
+            'messages' => Message::where('chat_room_id', $roomId)
+                ->oldest()
+                ->with('user:id,name')
+                ->get()
+                ->toResourceCollection(),
+        ]);
+    }
+
     public function post(string $roomId)
     {
-        $validated = request()->validate([
+        $validator = Validator::make([
+            'text' => request()->input('text'),
+        ], [
             'text' => ['bail', 'required', 'string', 'min:1', 'max:160'],
         ]);
+
+        if ($validator->fails()) {
+            throw ValidationException::withMessages([
+                'text' => $validator->errors()->first('text'),
+            ]);
+        }
+
+        $text = $validator->safe()->only(['text'])['text'];
 
         $room = ChatRoom::find($roomId);
 
@@ -38,7 +81,7 @@ class MessageController extends Controller
         }
 
         $message = $room->messages()->create([
-            'text' => $validated['text'],
+            'text' => $text,
             'chat_room_id' => $room->id,
             'user_id' => $currentUser->id,
         ]);

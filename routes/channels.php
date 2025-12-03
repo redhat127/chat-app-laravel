@@ -10,5 +10,5 @@ Broadcast::channel('room.{roomId}', function ($user, string $roomId) {
         return false;
     }
 
-    return $room->members()->where('member_id', $user->id)->exists();
+    return true;
 });

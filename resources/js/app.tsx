@@ -14,9 +14,6 @@ configureEcho({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
       retry: 0,
     },
   },
