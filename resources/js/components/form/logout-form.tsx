@@ -1,10 +1,12 @@
 import LogoutController from '@/actions/App/Http/Controllers/LogoutController';
 import { router } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { LogOutIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export const LogoutForm = () => {
   const [isPending, setIsPending] = useState(false);
+  const queryClient = useQueryClient();
   return (
     <form
       className="w-full"
@@ -16,6 +18,9 @@ export const LogoutForm = () => {
           },
           onFinish() {
             setIsPending(false);
+          },
+          onSuccess() {
+            queryClient.removeQueries();
           },
         });
       }}
