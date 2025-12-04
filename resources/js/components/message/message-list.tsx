@@ -53,7 +53,7 @@ const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
 
   return (
     <>
-      {!isFetching && <div ref={loadMoreRef} />}
+      {!isFetching && hasNextPage && <div ref={loadMoreRef} />}
       {isFetchingNextPage && (
         <div className="fixed top-4 left-4 rounded-md bg-red-600 p-2 px-4 text-center text-sm text-white">Loading older messages...</div>
       )}
