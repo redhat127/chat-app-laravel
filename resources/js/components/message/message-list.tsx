@@ -17,8 +17,6 @@ const getRoomMessages = async (roomId: string, signal: AbortSignal, cursor?: str
 };
 
 const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
-  const roomMessageScrollTargetRef = useRef<HTMLDivElement>(null);
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useSuspenseInfiniteQuery<
     PaginatedMessagesResponse,
     Error,
@@ -44,10 +42,12 @@ const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
     },
   });
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const roomMessageScrollTarget = roomMessageScrollTargetRef.current;
-    if (roomMessageScrollTarget) {
-      roomMessageScrollTarget.scrollIntoView({ behavior: 'auto' });
+    const messagesEnd = messagesEndRef.current;
+    if (messagesEnd) {
+      messagesEnd.scrollIntoView({ behavior: 'auto' });
     }
   }, []);
 
@@ -86,7 +86,7 @@ const MessageListSuspenseQuery = ({ roomId }: { roomId: string }) => {
           );
         })}
       </div>
-      <div ref={roomMessageScrollTargetRef} id="room-messages-scroll-target" />
+      <div ref={messagesEndRef} id="room-messages-end" />
     </>
   );
 };

@@ -21,3 +21,10 @@ export const setServerValidationErrors = <TFieldValues extends FieldValues = Fie
     }
   });
 };
+
+export const scrollWindowToBottom = () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: 'smooth',
+  });
+};

@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { LoadingSwap } from '@/components/ui/loading-swap';
 import { Textarea } from '@/components/ui/textarea';
+import { useAddNewMessageToMessagesQuery } from '@/hooks/use-add-new-message-to-messages-query';
 import { cn } from '@/lib/utils';
-import type { Message, PaginatedMessagesResponse } from '@/types';
+import type { Message } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { echo } from '@laravel/echo-react';
-import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -55,7 +56,7 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
     },
   });
   const isFormDisabled = isSubmitting || isPending;
-  const queryClient = useQueryClient();
+  const { addNewMessageToMessagesQuery } = useAddNewMessageToMessagesQuery(roomId);
   const onSubmitHandler = handleSubmit(async ({ text }) => {
     const socketId = echo().socketId();
     if (!socketId || !currentUserIsMember) return;
@@ -64,31 +65,7 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
       {
         onSuccess({ new_message }) {
           resetField('text');
-          queryClient.setQueryData<InfiniteData<PaginatedMessagesResponse>>(['messages', { roomId }], (oldData) => {
-            if (!oldData?.pages.length) return oldData;
-
-            const updatedPages = [...oldData.pages];
-
-            updatedPages[0] = {
-              ...updatedPages[0],
-              messages: [new_message, ...updatedPages[0].messages],
-            };
-
-            return {
-              ...oldData,
-              pages: updatedPages,
-            };
-          });
-
-          const roomMessagesScrollTarget = document.querySelector('#room-messages-scroll-target');
-          if (roomMessagesScrollTarget) {
-            setTimeout(() => {
-              window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth',
-              });
-            }, 100);
-          }
+          addNewMessageToMessagesQuery({ new_message });
         },
         onError(e) {
           if (e instanceof AxiosError) {

@@ -7,12 +7,12 @@ import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAddNewMessageToMessagesQuery } from '@/hooks/use-add-new-message-to-messages-query';
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
-import type { Message, PaginatedMessagesResponse, Room } from '@/types';
+import type { Message, Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { echo, useEcho } from '@laravel/echo-react';
-import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 
@@ -25,41 +25,12 @@ export default function ShowRoom({
   currentUserIsMember: boolean;
   currentUserIsCreator: boolean;
 }) {
-  const queryClient = useQueryClient();
-
   const [roomOnlineUserIds, setRoomOnlineUserIds] = useState<string[]>([]);
 
+  const { addNewMessageToMessagesQuery } = useAddNewMessageToMessagesQuery(room.id, true);
+
   const { listen: roomListen, leave: roomLeave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
-    queryClient.setQueryData<InfiniteData<PaginatedMessagesResponse>>(['messages', { roomId: room.id }], (oldData) => {
-      if (!oldData?.pages.length) return oldData;
-
-      const updatedPages = [...oldData.pages];
-
-      updatedPages[0] = {
-        ...updatedPages[0],
-        messages: [data.new_message, ...updatedPages[0].messages],
-      };
-
-      return {
-        ...oldData,
-        pages: updatedPages,
-      };
-    });
-
-    const roomMessagesScrollTarget = document.querySelector('#room-messages-scroll-target');
-    if (roomMessagesScrollTarget) {
-      const rect = roomMessagesScrollTarget.getBoundingClientRect();
-      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-
-      if (isInView) {
-        setTimeout(() => {
-          window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: 'smooth',
-          });
-        }, 100);
-      }
-    }
+    addNewMessageToMessagesQuery(data);
   });
 
   useEffect(() => {
