@@ -7,14 +7,14 @@ import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useShowOnlineUsersCount } from '@/hooks/use-show-online-users-count';
 import { useShowRealTimeMessages } from '@/hooks/use-show-realtime-messages';
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
 import type { Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { echo } from '@laravel/echo-react';
 import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 export default function ShowRoom({
   room: { data: room },
@@ -25,37 +25,8 @@ export default function ShowRoom({
   currentUserIsMember: boolean;
   currentUserIsCreator: boolean;
 }) {
-  const [roomOnlineUserIds, setRoomOnlineUserIds] = useState<string[]>([]);
-
   useShowRealTimeMessages(room.id, 'BroadcastMessageEvent');
-
-  const e = echo();
-  const roomOnlineUserIdsChannel = e.join('room.' + room.id + '.user-id');
-
-  useEffect(() => {
-    roomOnlineUserIdsChannel.subscribe();
-
-    roomOnlineUserIdsChannel.here((users: Array<{ user_id: string; current_user_exists_as_member: boolean }>) => {
-      setRoomOnlineUserIds(users.filter((user) => user.current_user_exists_as_member).map((user) => user.user_id));
-    });
-
-    roomOnlineUserIdsChannel.joining((data: { user_id: string; current_user_exists_as_member: boolean }) => {
-      if (!data.current_user_exists_as_member) return;
-      setRoomOnlineUserIds((prev) => {
-        if (prev.includes(data.user_id)) return prev;
-        return [...prev, data.user_id];
-      });
-    });
-
-    roomOnlineUserIdsChannel.leaving((data: { user_id: string; current_user_exists_as_member: boolean }) => {
-      if (!data.current_user_exists_as_member) return;
-      setRoomOnlineUserIds((prev) => {
-        return prev.filter((uId) => uId !== data.user_id);
-      });
-    });
-
-    return () => roomOnlineUserIdsChannel.unsubscribe();
-  }, [roomOnlineUserIdsChannel]);
+  const { usersCount } = useShowOnlineUsersCount(room.id);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -68,7 +39,7 @@ export default function ShowRoom({
       <Card className="fixed top-4 left-1/2 -translate-x-1/2 py-2 text-xs">
         <CardContent className="flex items-center gap-1.5 px-4">
           <div className="size-1.5 animate-pulse rounded-full bg-green-600" />
-          {roomOnlineUserIds.length} {roomOnlineUserIds.length === 1 ? 'Person' : 'People'} Online
+          {usersCount.length} {usersCount.length === 1 ? 'Person' : 'People'} Online
         </CardContent>
       </Card>
       <div className="mb-48 space-y-4 p-4 px-8">
