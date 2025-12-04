@@ -33,12 +33,15 @@ class MessageController extends Controller
 
         $roomId = $validator->safe()->only(['roomId'])['roomId'];
 
+        $messages = Message::where('chat_room_id', $roomId)
+            ->latest()
+            ->with('user:id,name,avatar')
+            ->cursorPaginate(10)
+            ->toResourceCollection();
+
         return response()->json([
-            'messages' => Message::where('chat_room_id', $roomId)
-                ->oldest()
-                ->with('user:id,name,avatar')
-                ->get()
-                ->toResourceCollection(),
+            'messages' => $messages,
+            'next_cursor' => $messages->nextCursor()?->encode(),
         ]);
     }
 

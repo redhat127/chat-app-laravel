@@ -34,3 +34,8 @@ export type flashMessage = {
   type: 'error' | 'success';
   text: string;
 } | null;
+
+export type PaginatedMessagesResponse = {
+  messages: Message[];
+  next_cursor: string | null;
+};

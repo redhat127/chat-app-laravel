@@ -17,7 +17,7 @@ class ChatRoomFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'is_public' => true,
         ];
     }
 }

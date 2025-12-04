@@ -4,10 +4,10 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { LoadingSwap } from '@/components/ui/loading-swap';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import type { Message } from '@/types';
+import type { Message, PaginatedMessagesResponse } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { echo } from '@laravel/echo-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -64,9 +64,31 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
       {
         onSuccess({ new_message }) {
           resetField('text');
-          queryClient.setQueryData<Message[]>(['messages', { roomId }], (messages = []) => {
-            return [...messages, new_message];
+          queryClient.setQueryData<InfiniteData<PaginatedMessagesResponse>>(['messages', { roomId }], (oldData) => {
+            if (!oldData?.pages.length) return oldData;
+
+            const updatedPages = [...oldData.pages];
+
+            updatedPages[0] = {
+              ...updatedPages[0],
+              messages: [new_message, ...updatedPages[0].messages],
+            };
+
+            return {
+              ...oldData,
+              pages: updatedPages,
+            };
           });
+
+          const roomMessagesScrollTarget = document.querySelector('#room-messages-scroll-target');
+          if (roomMessagesScrollTarget) {
+            setTimeout(() => {
+              window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth',
+              });
+            }, 100);
+          }
         },
         onError(e) {
           if (e instanceof AxiosError) {

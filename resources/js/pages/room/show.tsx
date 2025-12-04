@@ -9,10 +9,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
-import type { Message, Room } from '@/types';
+import type { Message, PaginatedMessagesResponse, Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { echo, useEcho } from '@laravel/echo-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 
@@ -30,9 +30,36 @@ export default function ShowRoom({
   const [roomOnlineUserIds, setRoomOnlineUserIds] = useState<string[]>([]);
 
   const { listen: roomListen, leave: roomLeave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
-    queryClient.setQueryData<Message[]>(['messages', { roomId: room.id }], (messages = []) => {
-      return [...messages, data.new_message];
+    queryClient.setQueryData<InfiniteData<PaginatedMessagesResponse>>(['messages', { roomId: room.id }], (oldData) => {
+      if (!oldData?.pages.length) return oldData;
+
+      const updatedPages = [...oldData.pages];
+
+      updatedPages[0] = {
+        ...updatedPages[0],
+        messages: [data.new_message, ...updatedPages[0].messages],
+      };
+
+      return {
+        ...oldData,
+        pages: updatedPages,
+      };
     });
+
+    const roomMessagesScrollTarget = document.querySelector('#room-messages-scroll-target');
+    if (roomMessagesScrollTarget) {
+      const rect = roomMessagesScrollTarget.getBoundingClientRect();
+      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+      if (isInView) {
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 100);
+      }
+    }
   });
 
   useEffect(() => {
@@ -78,7 +105,7 @@ export default function ShowRoom({
       <Head>
         <title>{generateTitle(room.name)}</title>
       </Head>
-      <Card className="fixed top-4 left-1/2 -translate-x-1/2 py-2 text-sm">
+      <Card className="fixed top-4 left-1/2 -translate-x-1/2 py-2 text-xs">
         <CardContent className="flex items-center gap-1.5 px-4">
           <div className="size-1.5 animate-pulse rounded-full bg-green-600" />
           {roomOnlineUserIds.length} {roomOnlineUserIds.length === 1 ? 'Person' : 'People'} Online
