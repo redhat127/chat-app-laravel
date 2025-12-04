@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import type { Message } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { echo } from '@laravel/echo-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -57,12 +57,18 @@ export const SendMessageForm = ({ currentUserIsMember, roomId }: { currentUserIs
   });
   const isFormDisabled = isSubmitting || isPending;
   const { addNewMessageToMessagesQuery } = useAddNewMessageToMessagesQuery(roomId);
+  const queryClient = useQueryClient();
   const onSubmitHandler = handleSubmit(async ({ text }) => {
     const socketId = echo().socketId();
     if (!socketId || !currentUserIsMember) return;
     sendMessage(
       { text, roomId, socketId },
       {
+        onSettled() {
+          return queryClient.invalidateQueries({
+            queryKey: ['messages', { roomId }],
+          });
+        },
         onSuccess({ new_message }) {
           resetField('text');
           addNewMessageToMessagesQuery({ new_message });
