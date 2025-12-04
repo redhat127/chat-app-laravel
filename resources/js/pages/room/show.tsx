@@ -7,12 +7,12 @@ import { LeaveRoomForm } from '@/components/room/leave-room-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAddNewMessageToMessagesQuery } from '@/hooks/use-add-new-message-to-messages-query';
+import { useShowRealTimeMessages } from '@/hooks/use-show-realtime-messages';
 import { generateTitle } from '@/lib/utils';
 import { home } from '@/routes';
-import type { Message, Room } from '@/types';
+import type { Room } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { echo, useEcho } from '@laravel/echo-react';
+import { echo } from '@laravel/echo-react';
 import { CircleAlert, Ellipsis, UserPlus } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 
@@ -27,18 +27,7 @@ export default function ShowRoom({
 }) {
   const [roomOnlineUserIds, setRoomOnlineUserIds] = useState<string[]>([]);
 
-  const { addNewMessageToMessagesQuery } = useAddNewMessageToMessagesQuery(room.id, true);
-
-  const { listen: roomListen, leave: roomLeave } = useEcho<{ new_message: Message }>('room.' + room.id, 'BroadcastMessageEvent', (data) => {
-    addNewMessageToMessagesQuery(data);
-  });
-
-  useEffect(() => {
-    roomListen();
-    return () => {
-      roomLeave();
-    };
-  }, [roomListen, roomLeave]);
+  useShowRealTimeMessages(room.id, 'BroadcastMessageEvent');
 
   const e = echo();
   const roomOnlineUserIdsChannel = e.join('room.' + room.id + '.user-id');
