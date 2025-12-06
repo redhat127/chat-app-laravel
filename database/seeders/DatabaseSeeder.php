@@ -27,10 +27,9 @@ class DatabaseSeeder extends Seeder
 
         $redhat = User::factory()->create([
             'name' => 'redhat',
-            'email' => 'saeid.ebrahimi127@gmail.com',
+            'email' => 'redhat@example.com',
             'password' => Hash::make('password123456'),
-            'provider_name' => 'github',
-            'avatar' => 'https://avatars.githubusercontent.com/u/149868560?v=4',
+            'provider_name' => 'github'
         ]);
 
         $testChatRoom = ChatRoom::factory()->create([
